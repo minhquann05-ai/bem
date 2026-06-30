@@ -7,23 +7,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
-        
         body {
             font-family: 'Inter', system_ui, sans-serif;
         }
-        
         .font-display {
             font-family: 'Space Grotesk', 'Inter', sans-serif;
             font-weight: 600;
         }
-
         .lottery-input {
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
             font-size: 14px;
             line-height: 1.5;
         }
-
         .result-line {
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
             font-size: 15px;
@@ -31,11 +26,9 @@
             border-radius: 6px;
             transition: all 0.2s ease;
         }
-
         .result-line:hover {
             background-color: #f8fafc;
         }
-
         .prize-badge {
             font-size: 12px;
             padding: 2px 8px;
@@ -85,14 +78,12 @@
                     </div>
                     
                     <div class="flex items-center gap-x-1.5">
-                        <!-- Paste Button -->
                         <button onclick="pasteFromClipboard()"
                                 class="flex items-center gap-x-2 px-3.5 py-2 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 transition-all text-white text-sm font-medium rounded-2xl shadow-sm">
                             <i class="fa-solid fa-paste mr-1.5"></i>
                             <span class="hidden sm:inline">Dán</span>
                         </button>
                         
-                        <!-- Clear Input -->
                         <button onclick="clearInput()"
                                 class="flex items-center justify-center w-9 h-9 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
                                 title="Xoá nội dung nhập">
@@ -135,7 +126,6 @@
                     </div>
                     
                     <div class="flex items-center gap-x-1.5">
-                        <!-- Copy Button -->
                         <button onclick="copyResult()"
                                 id="copyBtn"
                                 class="flex items-center gap-x-2 px-3.5 py-2 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 transition-all text-white text-sm font-medium rounded-2xl shadow-sm disabled:opacity-40"
@@ -144,7 +134,6 @@
                             <span class="hidden sm:inline">Sao chép</span>
                         </button>
                         
-                        <!-- Clear Output -->
                         <button onclick="clearOutput()"
                                 class="flex items-center justify-center w-9 h-9 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
                                 title="Xoá kết quả">
@@ -181,24 +170,20 @@
             
         </div>
 
-        <!-- Smart Tips -->
         <div class="mt-6 bg-white/70 border border-slate-200 rounded-3xl p-5 text-sm">
             <div class="flex items-start gap-x-3">
                 <div class="mt-0.5">
                     <i class="fa-solid fa-lightbulb text-amber-500"></i>
                 </div>
                 <div class="text-slate-600 text-xs leading-relaxed">
-                    <span class="font-semibold text-slate-700">Mẹo thông minh:</span> 
-                    Web sẽ tự động nhận diện các dòng <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded">"Giải Đb"</span>, 
-                    <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded">"Giải Nhất"</span>... và chỉ lấy số giải thưởng, 
-                    bỏ qua các dòng thống kê đầu đuôi.
+                    <span class="font-semibold text-slate-700">Đã sửa lỗi parser</span> — Bây giờ nhận diện đầy đủ và chính xác hơn.
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // ==================== LOGIC CHUYỂN ĐỔI ====================
+        // ==================== PARSER ĐÃ SỬA LỖI ====================
         function parseAndConvert(input) {
             if (!input || input.trim() === '') {
                 return { success: false, message: 'Vui lòng nhập dữ liệu!' };
@@ -227,30 +212,39 @@
 
             for (let line of lines) {
                 const lowerLine = line.toLowerCase();
-                
-                let foundNewType = false;
+
+                // Phát hiện dòng tên giải
+                let foundPrize = false;
                 for (const [keyword, type] of Object.entries(prizeKeywords)) {
                     if (lowerLine.includes(keyword)) {
                         currentType = type;
-                        foundNewType = true;
+                        foundPrize = true;
                         break;
                     }
                 }
-                if (foundNewType) continue;
+                if (foundPrize) continue;
 
-                if (currentType) {
-                    const matches = line.match(/\b\d{2,6}\b/g);
-                    if (matches) {
-                        for (let num of matches) {
-                            const isLikelyStat = /^[0-9,\s]+$/.test(line) && num.length <= 2 && line.split(/\s|,/).length > 2;
-                            if (!isLikelyStat && num.length >= 2) {
-                                prizes[currentType].push(num);
-                            }
-                        }
-                    }
+                if (!currentType) continue;
+
+                // Tìm số
+                const matches = line.match(/\b\d{2,6}\b/g) || [];
+                if (matches.length === 0) continue;
+
+                // Bỏ qua dòng thống kê (toàn bộ là số nhỏ và có ≥ 2 số)
+                const allSmallNumbers = matches.every(num => num.length <= 2);
+                const hasMultipleNumbers = matches.length >= 2;
+
+                if (allSmallNumbers && hasMultipleNumbers) {
+                    continue; // Bỏ qua dòng đầu đuôi
+                }
+
+                // Thêm số hợp lệ
+                for (let num of matches) {
+                    prizes[currentType].push(num);
                 }
             }
 
+            // Tạo output
             let outputLines = [];
             if (prizes.db.length > 0) outputLines.push(`ĐB ${prizes.db.join(' ')}`);
             if (prizes.g1.length > 0) outputLines.push(`G.1 ${prizes.g1.join(' ')}`);
@@ -295,7 +289,9 @@
             const lines = result.output.split('\n');
             
             lines.forEach(line => {
-                const [label, numbers] = line.split(' ');
+                const parts = line.split(' ');
+                const label = parts[0];
+                const numbers = parts.slice(1).join(' ');
                 html += `
                     <div class="result-line flex items-center justify-between bg-white border border-slate-100 px-4 py-2.5 rounded-2xl">
                         <div class="flex items-center gap-x-3">
@@ -313,7 +309,6 @@
             window.currentResult = result.output;
         }
 
-        // ==================== CÁC NÚT CHỨC NĂNG ====================
         async function pasteFromClipboard() {
             try {
                 const text = await navigator.clipboard.readText();
@@ -412,7 +407,6 @@ Giải Tám
             setTimeout(() => convertLottery(), 200);
         }
 
-        // Phím tắt
         function setupKeyboardShortcuts() {
             document.addEventListener('keydown', function(e) {
                 if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
@@ -428,7 +422,6 @@ Giải Tám
 
         function initializeApp() {
             setupKeyboardShortcuts();
-            console.log('%c[Lottery Converter] Web app ready.', 'color:#64748b');
         }
 
         window.onload = initializeApp;
