@@ -1,278 +1,437 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chuyển đổi Kết quả Xổ số</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Roboto+Mono:wght@400;500&amp;display=swap');
-    
-    body {
-      font-family: 'Inter', system_ui, sans-serif;
-    }
-    
-    .mono {
-      font-family: 'Roboto Mono', monospace;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuyển đổi Kết quả Xổ số • Thông minh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+        }
 
-    .result-line {
-      transition: all 0.2s ease;
-    }
-    
-    .result-line:hover {
-      background-color: #f8fafc;
-    }
+        .lottery-input {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
 
-    .lottery-input {
-      font-family: 'Roboto Mono', monospace;
-      line-height: 1.5;
-    }
-  </style>
+        .result-line {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 15px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .result-line:hover {
+            background-color: #f8fafc;
+        }
+
+        .prize-badge {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+    </style>
 </head>
-<body class="bg-zinc-950 text-zinc-200">
-  <div class="max-w-6xl mx-auto p-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="text-3xl font-semibold tracking-tight">Chuyển đổi Kết quả Xổ số</h1>
-        <p class="text-zinc-400 mt-1">Từ định dạng lộn xộn → Định dạng chuẩn (ĐB, G.1, G.2...)</p>
-      </div>
-      <div class="flex items-center gap-x-2">
-        <button onclick="loadExample()" 
-                class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium flex items-center gap-x-2 transition-colors">
-          <i class="fa-solid fa-file-import"></i>
-          <span>Tải ví dụ</span>
-        </button>
-        <button onclick="clearAll()" 
-                class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-sm font-medium flex items-center gap-x-2 transition-colors">
-          <i class="fa-solid fa-trash"></i>
-          <span>Xóa</span>
-        </button>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      
-      <!-- Input -->
-      <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-x-2">
-            <i class="fa-solid fa-file-lines text-emerald-400"></i>
-            <span class="font-semibold">Dữ liệu gốc</span>
-          </div>
-          <span class="text-xs px-3 py-1 bg-zinc-800 rounded-full text-zinc-400">Dán kết quả vào đây</span>
-        </div>
-        
-        <textarea id="inputText" rows="18" 
-                  class="lottery-input w-full bg-zinc-950 border border-zinc-700 focus:border-emerald-500 rounded-2xl p-4 text-sm resize-y outline-none"
-                  placeholder="Dán nội dung kết quả xổ số ở đây...&#10;Ví dụ:&#10;Giải Đb&#10;39256&#10;Giải Nhất&#10;76167&#10;..."></textarea>
-      </div>
-
-      <!-- Output -->
-      <div class="bg-zinc-900 border border-zinc-800 rounded-3xl p-6">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-x-2">
-            <i class="fa-solid fa-check-circle text-emerald-400"></i>
-            <span class="font-semibold">Kết quả đã chuẩn hóa</span>
-          </div>
-          <button onclick="copyResult()" 
-                  class="px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-500 transition-colors rounded-xl flex items-center gap-x-2">
-            <i class="fa-solid fa-copy"></i>
-            <span>Sao chép</span>
-          </button>
+<body class="bg-slate-100">
+    <div class="max-w-6xl mx-auto p-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <div class="flex items-center gap-x-3">
+                    <div class="w-11 h-11 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                        <i class="fa-solid fa-ticket text-white text-3xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-display font-semibold tracking-tighter text-slate-900">Chuyển đổi Kết quả Xổ số</h1>
+                        <p class="text-slate-500 text-sm">Từ định dạng thô → Định dạng sạch (ĐB → G.8)</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-x-2">
+                <button onclick="loadExample()" 
+                        class="flex items-center gap-x-2 px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-2xl text-sm font-medium transition-all active:scale-[0.985]">
+                    <i class="fa-solid fa-file-import mr-2"></i>
+                    <span>Tải ví dụ</span>
+                </button>
+            </div>
         </div>
 
-        <textarea id="outputText" rows="18" readonly
-                  class="lottery-input w-full bg-zinc-950 border border-zinc-700 rounded-2xl p-4 text-sm resize-y outline-none font-medium"></textarea>
-        
-        <div id="stats" class="mt-3 text-xs text-zinc-400 flex items-center gap-x-4 hidden">
-          <div>Đã chuyển đổi: <span id="prizeCount" class="font-semibold text-emerald-400">0</span> giải</div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- INPUT PANEL -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-6 pt-5 pb-4 border-b border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-8 h-8 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center">
+                            <i class="fa-solid fa-edit text-lg"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-slate-800">Dữ liệu đầu vào</div>
+                            <div class="text-xs text-slate-500">Dán kết quả từ website xổ số</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-x-1.5">
+                        <!-- Paste Button -->
+                        <button onclick="pasteFromClipboard()"
+                                class="flex items-center gap-x-2 px-3.5 py-2 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 transition-all text-white text-sm font-medium rounded-2xl shadow-sm">
+                            <i class="fa-solid fa-paste mr-1.5"></i>
+                            <span class="hidden sm:inline">Dán</span>
+                        </button>
+                        
+                        <!-- Clear Input -->
+                        <button onclick="clearInput()"
+                                class="flex items-center justify-center w-9 h-9 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
+                                title="Xoá nội dung nhập">
+                            <i class="fa-solid fa-trash text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-5">
+                    <textarea id="inputText" rows="14" 
+                              class="lottery-input w-full px-4 py-3.5 border border-slate-200 focus:border-indigo-300 focus:ring-2 focus:ring-indigo-100 outline-none rounded-2xl resize-y text-slate-700 placeholder:text-slate-400"
+                              placeholder="Dán kết quả xổ số vào đây..."></textarea>
+                    
+                    <div class="flex items-center justify-between mt-3">
+                        <div class="text-xs text-slate-400 flex items-center gap-x-1.5">
+                            <i class="fa-solid fa-info-circle"></i>
+                            <span>Tự động nhận diện giải thưởng</span>
+                        </div>
+                        
+                        <button onclick="convertLottery()"
+                                class="flex items-center gap-x-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 transition-all text-white text-sm font-semibold rounded-2xl shadow-md shadow-indigo-200">
+                            <i class="fa-solid fa-magic mr-2"></i>
+                            <span>Chuyển đổi</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OUTPUT PANEL -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-6 pt-5 pb-4 border-b border-slate-100 flex items-center justify-between">
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center">
+                            <i class="fa-solid fa-check-double text-lg"></i>
+                        </div>
+                        <div>
+                            <div class="font-semibold text-slate-800">Kết quả đã chuyển đổi</div>
+                            <div class="text-xs text-emerald-600">Định dạng sạch • ĐB → G.8</div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-x-1.5">
+                        <!-- Copy Button -->
+                        <button onclick="copyResult()"
+                                id="copyBtn"
+                                class="flex items-center gap-x-2 px-3.5 py-2 bg-emerald-500 hover:bg-emerald-600 active:bg-emerald-700 transition-all text-white text-sm font-medium rounded-2xl shadow-sm disabled:opacity-40"
+                                disabled>
+                            <i class="fa-solid fa-copy mr-1.5"></i>
+                            <span class="hidden sm:inline">Sao chép</span>
+                        </button>
+                        
+                        <!-- Clear Output -->
+                        <button onclick="clearOutput()"
+                                class="flex items-center justify-center w-9 h-9 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
+                                title="Xoá kết quả">
+                            <i class="fa-solid fa-trash text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-5">
+                    <div id="outputArea" 
+                         class="min-h-[280px] bg-slate-50 border border-slate-200 rounded-2xl p-4 font-mono text-sm overflow-auto">
+                        <div class="flex flex-col items-center justify-center h-full text-center py-8">
+                            <i class="fa-solid fa-arrow-right-arrow-left text-3xl text-slate-300 mb-3"></i>
+                            <p class="text-slate-400 text-sm">Kết quả sẽ hiển thị ở đây sau khi chuyển đổi</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3 flex items-center justify-between text-xs">
+                        <div class="flex items-center gap-x-2 text-emerald-600">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span class="font-medium">Đã loại bỏ thống kê đầu đuôi</span>
+                        </div>
+                        
+                        <button onclick="downloadResult()" 
+                                id="downloadBtn"
+                                class="flex items-center gap-x-1.5 text-emerald-600 hover:text-emerald-700 font-medium disabled:opacity-40"
+                                disabled>
+                            <i class="fa-solid fa-download text-xs"></i>
+                            <span class="text-xs">Tải .txt</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
         </div>
-      </div>
+
+        <!-- Smart Tips -->
+        <div class="mt-6 bg-white/70 border border-slate-200 rounded-3xl p-5 text-sm">
+            <div class="flex items-start gap-x-3">
+                <div class="mt-0.5">
+                    <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                </div>
+                <div class="text-slate-600 text-xs leading-relaxed">
+                    <span class="font-semibold text-slate-700">Mẹo thông minh:</span> 
+                    Web sẽ tự động nhận diện các dòng <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded">"Giải Đb"</span>, 
+                    <span class="font-mono bg-slate-100 px-1.5 py-0.5 rounded">"Giải Nhất"</span>... và chỉ lấy số giải thưởng, 
+                    bỏ qua các dòng thống kê đầu đuôi.
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="mt-6 flex justify-center">
-      <button onclick="convertLottery()" 
-              class="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 transition-all text-white font-semibold rounded-2xl flex items-center gap-x-3 text-base shadow-lg shadow-emerald-950">
-        <i class="fa-solid fa-sync fa-fw"></i>
-        <span>Chuyển đổi ngay</span>
-      </button>
-    </div>
+    <script>
+        // ==================== LOGIC CHUYỂN ĐỔI ====================
+        function parseAndConvert(input) {
+            if (!input || input.trim() === '') {
+                return { success: false, message: 'Vui lòng nhập dữ liệu!' };
+            }
 
-    <div class="text-center mt-8 text-xs text-zinc-500">
-      Hỗ trợ định dạng: Giải Đb, Giải Nhất, Giải Nhì, Giải Ba, Giải Tư, Giải Năm, Giải Sáu, Giải Bảy
-    </div>
-  </div>
+            const lines = input.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            
+            const prizes = {
+                db: [], g1: [], g2: [], g3: [], g4: [],
+                g5: [], g6: [], g7: [], g8: []
+            };
 
-  <script>
-    function convertLottery() {
-      const input = document.getElementById('inputText').value.trim();
-      if (!input) {
-        alert("Vui lòng dán dữ liệu vào ô bên trái!");
-        return;
-      }
+            let currentType = null;
 
-      const lines = input.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            const prizeKeywords = {
+                'đb': 'db', 'đặc biệt': 'db', 'giải đb': 'db',
+                'nhất': 'g1', 'giải nhất': 'g1',
+                'nhì': 'g2', 'giải nhì': 'g2',
+                'ba': 'g3', 'giải ba': 'g3',
+                'tư': 'g4', 'giải tư': 'g4',
+                'năm': 'g5', 'giải năm': 'g5',
+                'sáu': 'g6', 'giải sáu': 'g6',
+                'bảy': 'g7', 'giải bảy': 'g7',
+                'tám': 'g8', 'giải tám': 'g8'
+            };
 
-      const prizeMap = {
-        "giải đb": "ĐB",
-        "giải nhất": "G.1",
-        "giải nhì": "G.2",
-        "giải ba": "G.3",
-        "giải tư": "G.4",
-        "giải năm": "G.5",
-        "giải sáu": "G.6",
-        "giải bảy": "G.7"
-      };
+            for (let line of lines) {
+                const lowerLine = line.toLowerCase();
+                
+                let foundNewType = false;
+                for (const [keyword, type] of Object.entries(prizeKeywords)) {
+                    if (lowerLine.includes(keyword)) {
+                        currentType = type;
+                        foundNewType = true;
+                        break;
+                    }
+                }
+                if (foundNewType) continue;
 
-      let result = [];
-      let currentPrize = null;
-      let currentNumbers = [];
+                if (currentType) {
+                    const matches = line.match(/\b\d{2,6}\b/g);
+                    if (matches) {
+                        for (let num of matches) {
+                            const isLikelyStat = /^[0-9,\s]+$/.test(line) && num.length <= 2 && line.split(/\s|,/).length > 2;
+                            if (!isLikelyStat && num.length >= 2) {
+                                prizes[currentType].push(num);
+                            }
+                        }
+                    }
+                }
+            }
 
-      for (let line of lines) {
-        const lowerLine = line.toLowerCase();
-        
-        // Kiểm tra dòng là tên giải thưởng
-        let foundPrize = null;
-        for (let [key, value] of Object.entries(prizeMap)) {
-          if (lowerLine.includes(key)) {
-            foundPrize = value;
-            break;
-          }
+            let outputLines = [];
+            if (prizes.db.length > 0) outputLines.push(`ĐB ${prizes.db.join(' ')}`);
+            if (prizes.g1.length > 0) outputLines.push(`G.1 ${prizes.g1.join(' ')}`);
+            if (prizes.g2.length > 0) outputLines.push(`G.2 ${prizes.g2.join(' ')}`);
+            if (prizes.g3.length > 0) outputLines.push(`G.3 ${prizes.g3.join(' ')}`);
+            if (prizes.g4.length > 0) outputLines.push(`G.4 ${prizes.g4.join(' ')}`);
+            if (prizes.g5.length > 0) outputLines.push(`G.5 ${prizes.g5.join(' ')}`);
+            if (prizes.g6.length > 0) outputLines.push(`G.6 ${prizes.g6.join(' ')}`);
+            if (prizes.g7.length > 0) outputLines.push(`G.7 ${prizes.g7.join(' ')}`);
+            if (prizes.g8.length > 0) outputLines.push(`G.8 ${prizes.g8.join(' ')}`);
+
+            if (outputLines.length === 0) {
+                return { success: false, message: 'Không tìm thấy số giải thưởng hợp lệ.' };
+            }
+
+            return {
+                success: true,
+                output: outputLines.join('\n')
+            };
         }
 
-        if (foundPrize) {
-          // Lưu giải trước đó (nếu có)
-          if (currentPrize && currentNumbers.length > 0) {
-            result.push(`${currentPrize} ${currentNumbers.join(' ')}`);
-          }
-          currentPrize = foundPrize;
-          currentNumbers = [];
-          continue;
+        function convertLottery() {
+            const input = document.getElementById('inputText').value;
+            const result = parseAndConvert(input);
+            const outputArea = document.getElementById('outputArea');
+            const copyBtn = document.getElementById('copyBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            if (!result.success) {
+                outputArea.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-center py-6">
+                        <i class="fa-solid fa-exclamation-triangle text-3xl text-amber-400 mb-3"></i>
+                        <p class="text-amber-600 font-medium">${result.message}</p>
+                    </div>
+                `;
+                copyBtn.disabled = true;
+                downloadBtn.disabled = true;
+                return;
+            }
+
+            let html = '<div class="space-y-1">';
+            const lines = result.output.split('\n');
+            
+            lines.forEach(line => {
+                const [label, numbers] = line.split(' ');
+                html += `
+                    <div class="result-line flex items-center justify-between bg-white border border-slate-100 px-4 py-2.5 rounded-2xl">
+                        <div class="flex items-center gap-x-3">
+                            <span class="prize-badge bg-emerald-100 text-emerald-700">${label}</span>
+                            <span class="font-mono text-slate-800 tracking-[1.5px] text-[15px]">${numbers}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            outputArea.innerHTML = html;
+            copyBtn.disabled = false;
+            downloadBtn.disabled = false;
+            window.currentResult = result.output;
         }
 
-        // Nếu đang ở trong phần giải thưởng → lấy số
-        if (currentPrize) {
-          // Tìm các số có 2-5 chữ số (bỏ qua dòng thống kê)
-          const numbers = line.match(/\b\d{2,5}\b/g);
-          if (numbers && numbers.length > 0) {
-            currentNumbers.push(...numbers);
-          }
+        // ==================== CÁC NÚT CHỨC NĂNG ====================
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    document.getElementById('inputText').value = text;
+                    setTimeout(() => convertLottery(), 300);
+                }
+            } catch (err) {
+                alert('Không thể truy cập clipboard. Hãy dùng Ctrl/Cmd + V');
+                document.getElementById('inputText').focus();
+            }
         }
-      }
 
-      // Lưu giải cuối cùng
-      if (currentPrize && currentNumbers.length > 0) {
-        result.push(`${currentPrize} ${currentNumbers.join(' ')}`);
-      }
+        async function copyResult() {
+            if (!window.currentResult) return;
+            try {
+                await navigator.clipboard.writeText(window.currentResult);
+                const btn = document.getElementById('copyBtn');
+                const old = btn.innerHTML;
+                btn.innerHTML = `<i class="fa-solid fa-check mr-1.5"></i> Đã sao chép!`;
+                btn.classList.add('!bg-emerald-600');
+                setTimeout(() => {
+                    btn.innerHTML = old;
+                    btn.classList.remove('!bg-emerald-600');
+                }, 1600);
+            } catch (e) {
+                alert('Đã sao chép!');
+            }
+        }
 
-      // Hiển thị kết quả
-      const outputArea = document.getElementById('outputText');
-      outputArea.value = result.join('\n');
+        function downloadResult() {
+            if (!window.currentResult) return;
+            const blob = new Blob([window.currentResult], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ket-qua-xo-so-${new Date().toISOString().slice(0,10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
 
-      // Hiển thị thống kê
-      const stats = document.getElementById('stats');
-      const count = document.getElementById('prizeCount');
-      
-      if (result.length > 0) {
-        stats.classList.remove('hidden');
-        count.textContent = result.length;
-      } else {
-        stats.classList.add('hidden');
-      }
-    }
+        function clearInput() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('inputText').focus();
+        }
 
-    function copyResult() {
-      const output = document.getElementById('outputText');
-      if (!output.value) {
-        alert("Chưa có kết quả để sao chép!");
-        return;
-      }
-      
-      navigator.clipboard.writeText(output.value).then(() => {
-        const originalText = event.currentTarget?.innerHTML;
-        const btns = document.querySelectorAll('button');
-        
-        // Hiệu ứng đã copy
-        const toast = document.createElement('div');
-        toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 bg-emerald-600 text-white px-5 py-2 rounded-2xl text-sm flex items-center gap-x-2 shadow-xl`;
-        toast.innerHTML = `<i class="fa-solid fa-check"></i> <span>Đã sao chép vào clipboard!</span>`;
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-          toast.style.transition = 'all 0.3s';
-          toast.style.opacity = '0';
-          setTimeout(() => toast.remove(), 300);
-        }, 1800);
-      }).catch(() => {
-        // Fallback nếu không dùng clipboard API
-        output.select();
-        document.execCommand('copy');
-        alert("Đã sao chép!");
-      });
-    }
+        function clearOutput() {
+            document.getElementById('outputArea').innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-center py-8">
+                    <i class="fa-solid fa-arrow-right-arrow-left text-3xl text-slate-300 mb-3"></i>
+                    <p class="text-slate-400 text-sm">Kết quả sẽ hiển thị ở đây sau khi chuyển đổi</p>
+                </div>
+            `;
+            document.getElementById('copyBtn').disabled = true;
+            document.getElementById('downloadBtn').disabled = true;
+            window.currentResult = null;
+        }
 
-    function loadExample() {
-      const example = `Giải Đb
-39256
-Tài
+        function loadExample() {
+            const example = `Giải Đb
+624007
+Xỉu
 Lẻ
 Hổ
 ĐầuĐuôi
 Giải Nhất
-76167
-0 2
+52575
+0 7
 Giải Nhì
-36520-40159
-1 7,2
+01892
+1 2,8
 Giải Ba
-94980-79002-86884
-22866-15933-74370
-2 0
-3 3,0,7,4
+06258-03859
+2 5,4,0
+3 3
 Giải Tư
-0664-5797-5294-8452
-4 8
-5 6,9,2,6,4,7
+81951-77481-23733
+45846-85990-41325
+29470
+4 6
+5 8,9,1
 Giải Năm
-3117-8830-3648-7912
-5237-8556
-6 7,6,4,7
-7 0,9,0
+0777
+6
 Giải Sáu
-554-179-034
-8 0,4
+2224-5220-6594
+7 5,0,7
 Giải Bảy
-70-57-67-91
-9 7,4,1`;
+812
+8 1
+Giải Tám
+18`;
+            document.getElementById('inputText').value = example;
+            setTimeout(() => convertLottery(), 200);
+        }
 
-      document.getElementById('inputText').value = example;
-      // Tự động chuyển đổi luôn cho tiện
-      setTimeout(() => {
-        convertLottery();
-      }, 300);
-    }
+        // Phím tắt
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                    e.preventDefault();
+                    convertLottery();
+                }
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault();
+                    document.getElementById('inputText').focus();
+                }
+            });
+        }
 
-    function clearAll() {
-      document.getElementById('inputText').value = '';
-      document.getElementById('outputText').value = '';
-      document.getElementById('stats').classList.add('hidden');
-    }
+        function initializeApp() {
+            setupKeyboardShortcuts();
+            console.log('%c[Lottery Converter] Web app ready.', 'color:#64748b');
+        }
 
-    // Cho phép nhấn Enter để chuyển đổi
-    document.getElementById('inputText').addEventListener('keydown', function(e) {
-      if (e.ctrlKey && e.key === 'Enter') {
-        convertLottery();
-      }
-    });
-
-    // Auto focus vào input khi load
-    window.onload = function() {
-      document.getElementById('inputText').focus();
-    }
-  </script>
+        window.onload = initializeApp;
+    </script>
 </body>
 </html>
